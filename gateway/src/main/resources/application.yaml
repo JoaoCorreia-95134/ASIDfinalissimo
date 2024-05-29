@@ -1,0 +1,52 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: students-parents-route
+          uri: http://localhost:8080
+          predicates:
+            - Path=/Servicos/getStudentsParent/**
+          filters:
+            - RewritePath=/Servicos/getStudentsParent/(?<path>.*), /Servicos/getStudentsParent/${path}
+        - id: search-persons-by-town-route
+          uri: http://localhost:8080
+          predicates:
+            - Path=/Servicos/searchPersonsByTown/**
+          filters:
+            - RewritePath=/Servicos/searchPersonsByTown/(?<path>.*), /Servicos/searchPersonsByTown/${path}
+        - id: search-persons-big-city-route
+          uri: http://localhost:8080
+          predicates:
+            - Path=/Servicos/searchPersonsBigCity/**
+          filters:
+            - RewritePath=/Servicos/searchPersonsBigCity, /Servicos/searchPersonsBigCity
+        - id: add-club-to-student-route
+          uri: http://localhost:8080
+          predicates:
+            - Path=/Servicos/addClubToStudent/**
+          filters:
+            - RewritePath=/Servicos/addClubToStudent/(?<path>.*), /Servicos/addClubToStudent/${path}
+        - id: add-teacher-view
+          uri: http://localhost:8080
+          predicates:
+            - Path=/Servicos/addClubToStudent/**
+          filters:
+            - RewritePath=/Servicos/addClubToStudent/(?<path>.*), /Servicos/addClubToStudent/${path}
+  application:
+    name: api-gateway
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+    gateway:
+      enabled: true
+server:
+  port: 8080
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka/}

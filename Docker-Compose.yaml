@@ -1,0 +1,209 @@
+version: "3.8"
+
+services:
+  eureka-server:
+    image: eurekaserver:latest
+    ports:
+      - "8761:8761"
+    networks:
+      - my-db-network
+  view_rep:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: 12345
+      MYSQL_USER: user
+      MYSQL_PASSWORD: paswword
+      MYSQL_DATABASE: school_db
+    ports:
+      - "3312:3306"
+    networks:
+      - my-db-network
+
+  town_rep:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: 12345
+      MYSQL_USER: user
+      MYSQL_PASSWORD: paswword
+      MYSQL_DATABASE: school_db
+    ports:
+      - "3310:3306" 
+    networks:
+      - my-db-network
+  teacher_rep:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: 12345
+      MYSQL_USER: user
+      MYSQL_PASSWORD: paswword
+      MYSQL_DATABASE: school_db
+    ports:
+      - "3306:3306" 
+    networks:
+      - my-db-network
+  student_rep:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: 12345
+      MYSQL_USER: user
+      MYSQL_PASSWORD: paswword
+      MYSQL_DATABASE: school_db
+    ports:
+      - "3307:3306"
+    networks:
+      - my-db-network
+  parent_rep:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: 12345
+      MYSQL_USER: user
+      MYSQL_PASSWORD: paswword
+      MYSQL_DATABASE: school_db
+    ports:
+      - "3308:3306" 
+    networks:
+      - my-db-network
+  employee_rep:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: 12345
+      MYSQL_USER: user
+      MYSQL_PASSWORD: paswword
+      MYSQL_DATABASE: school_db
+    ports:
+      - "3309:3306" 
+    networks:
+      - my-db-network
+  club_rep:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: 12345
+      MYSQL_USER: user
+      MYSQL_PASSWORD: paswword
+      MYSQL_DATABASE: school_db
+    ports:
+      - "3311:3306"
+    networks:
+      - my-db-network 
+
+  gateway-service:
+    image: gateway:latest  # Replace with your image name
+    ports:
+      - "8080:8080"  # Map container port to host port
+    networks:
+      - my-db-network
+    depends_on:
+      - eureka-server
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/ 
+      
+
+  view-service:
+    image: view:latest  # Replace with your image name
+    ports:
+      - "8089:8089"  # Map container port to host port
+    networks:
+      - my-db-network
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://view_rep:3306/school_db?createDatabaseIfNotExist=true
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/ 
+    depends_on:
+      - view_rep
+      - eureka-server
+    restart: always
+
+  town-service:
+    image: town:latest  # Replace with your image name
+    ports:
+      - "8085:8085"  # Map container port to host port
+    networks:
+      - my-db-network
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://town_rep:3306/school_db?createDatabaseIfNotExist=true
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/ 
+    depends_on:
+      - town_rep
+      - eureka-server
+    restart: always
+
+  teacher-service:
+    image: teacher:latest  # Replace with your image name
+    ports:
+      - "8081:8081"  # Map container port to host port
+    networks:
+      - my-db-network
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://teacher_rep:3306/school_db?createDatabaseIfNotExist=true
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/ 
+    depends_on:
+      - teacher_rep
+      - eureka-server
+    restart: always
+
+  student-service:
+    image: student:latest  # Replace with your image name
+    ports:
+      - "8082:8082"  # Map container port to host port
+    networks:
+      - my-db-network
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://student_rep:3306/school_db?createDatabaseIfNotExist=true
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/ 
+    depends_on:
+      - student_rep
+      - eureka-server
+    restart: always
+
+  parent-service:
+    image: parent:latest  # Replace with your image name
+    ports:
+      - "8086:8086"  # Map container port to host port
+    networks:
+      - my-db-network
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://parent_rep:3306/school_db?createDatabaseIfNotExist=true
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/ 
+    depends_on:
+      - parent_rep
+      - eureka-server
+    restart: always
+
+  employee-service:
+    image: employee:latest  # Replace with your image name
+    ports:
+      - "8084:8084"  # Map container port to host port
+    networks:
+      - my-db-network
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://employee_rep:3306/school_db?createDatabaseIfNotExist=true
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/ 
+    depends_on:
+        - employee_rep
+        - eureka-server
+    restart: always
+
+  club-service:
+    image: club:latest  # Replace with your image name
+    ports:
+      - "8087:8087"  # Map container port to host port
+    networks:
+      - my-db-network
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://club_rep:3306/school_db?createDatabaseIfNotExist=true
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/ 
+    depends_on:
+      - club_rep
+      - eureka-server
+    restart: always
+
+networks:
+  my-db-network:
+    driver: bridge
+
+
+
+
+
+
+
+
