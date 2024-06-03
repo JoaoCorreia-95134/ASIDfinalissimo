@@ -7,6 +7,7 @@ import com.iStudent.model.entity.base.BasePersonEntity;
 import com.iStudent.repository.ParentRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,6 +20,8 @@ public class ParentService {
     private final ModelMapper mapper;
 
     @Autowired
+    private KafkaTemplate<String, String> kafkaTemplate;
+
     public ParentService(ParentRepository parentRepository, ModelMapper mapper) {
         this.parentRepository = parentRepository;
         this.mapper = mapper;
@@ -44,12 +47,29 @@ public class ParentService {
     }
 
     public long addParent(ParentDTO parentDTO) {
+        // Log the received DTO
+        System.out.println("Received ParentDTO: " + parentDTO);
+
+        // Map ParentDTO to Parent entity
         Parent parent = mapper.map(parentDTO, Parent.class);
+
+        // Log the mapped entity
+        System.out.println("Mapped Parent entity: " + parent);
+
+        // Save the parent entity to the database
         parentRepository.save(parent);
+
+
+        // Send confirmation message
+        String confirmationMessage = "OK: " + parent.getId();
+        System.out.println("Sending confirmation message: " + confirmationMessage);
+        kafkaTemplate.send("parentOkTopic", confirmationMessage);
+
         return parent.getId();
     }
 
     public void deleteParentById(Long parentId) {
+        System.out.println("rip parent" + parentId);
         parentRepository.deleteById(parentId);
     }
 

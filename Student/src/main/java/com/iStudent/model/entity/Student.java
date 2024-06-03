@@ -28,7 +28,7 @@ public class Student extends BasePersonEntity {
     )
     private List<Mark> marks;
 
-    @Column(name = "enroll_date", nullable = false)
+    @Column(name = "enroll_date", nullable = true)
     private LocalDate enrollDate;
 
     public Student() {

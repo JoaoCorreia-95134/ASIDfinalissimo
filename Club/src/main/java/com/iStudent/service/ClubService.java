@@ -7,6 +7,7 @@ import com.iStudent.model.entity.Student;
 import com.iStudent.repository.ClubRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +21,12 @@ public class ClubService {
 
     private final ModelMapper mapper;
 
+    private Integer cont=0;
+
     @Autowired
+
+    private KafkaTemplate<String, String> kafkaTemplate;
+
     public ClubService(ClubRepository clubRepository, ModelMapper mapper) {
         this.clubRepository = clubRepository;
         this.mapper = mapper;
@@ -46,15 +52,36 @@ public class ClubService {
 
     @Transactional
     public void deleteClubById(Long clubId) {
+        System.out.println("rip club" + clubId);
         clubRepository.deleteById(clubId);
     }
 
     public long addClub(ClubDTO clubDTO) {
-        Club club = mapper.map(clubDTO, Club.class);
 
-        clubRepository.save(club);
+        Optional<Club> existingClub = clubRepository.findByName(clubDTO.getName());
+        if (existingClub.isPresent()) {
+            // A club with the same name already exists.
+            String erroMessage = "Erro: A club with the name"  + clubDTO.getName() +  "already exists.";
+            System.out.println(erroMessage);
+            if(cont==0){
+                kafkaTemplate.send("clubOkTopic",erroMessage);
+                cont=1;
+            }
+            throw new IllegalArgumentException("A club with the name " + clubDTO.getName() + " already exists.");
+        } else {
+            Club club = mapper.map(clubDTO, Club.class);
+            clubRepository.save(club);
 
-        return club.getId();
+            String confirmationMessage = "OK: " + clubRepository.findByName(club.getName()).get().getId();
+
+            System.out.println("Sending confirmation message: " + confirmationMessage);
+            kafkaTemplate.send("clubOkTopic", confirmationMessage);
+            return club.getId();
+        }
+    }
+
+    public void setCont(Integer cont) {
+        this.cont=cont;
     }
 
     @Transactional

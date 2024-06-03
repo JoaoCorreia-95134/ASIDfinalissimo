@@ -9,6 +9,7 @@ import com.iStudent.repository.MarkRepository;
 import com.iStudent.repository.StudentRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,6 +25,8 @@ public class StudentService {
     private final ModelMapper mapper;
 
     @Autowired
+    private KafkaTemplate<String, String> kafkaTemplate;
+
     public StudentService(StudentRepository studentRepository, MarkRepository markRepository, ModelMapper mapper) {
         this.studentRepository = studentRepository;
         this.markRepository = markRepository;
@@ -70,6 +73,12 @@ public class StudentService {
         student.setParent(studentDTO.getParent());
         studentRepository.save(student);
 
+        // Send confirmation message
+        String confirmationMessage = "OK: " + student.getId();
+        System.out.println("Sending confirmation message: " + confirmationMessage);
+        kafkaTemplate.send("studentOkTopic", confirmationMessage);
+
+
         return student.getId();
     }
 
@@ -88,6 +97,7 @@ public class StudentService {
     }
 
     public void deleteStudentById(Long studentId) {
+        System.out.println("rip student" + studentId);
         studentRepository.deleteById(studentId);
     }
 

@@ -16,6 +16,8 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.modelmapper.ModelMapper;
@@ -263,6 +265,16 @@ public class listaServicos {
             List<UsersWithLargeTown> userList = Arrays.asList(responseVIEW.getBody());
             return ResponseEntity.ok(userList);
         }
+    }
+
+    @PostMapping("/addClubStudentParent/createStudent")
+    public ResponseEntity<?> createStudent(@RequestBody Map<String, Object> payload) {
+
+        String url = "http://saga/saga/createStudent";
+
+        ResponseEntity<?> response = restTemplate.postForEntity(url, payload, String.class);
+
+            return response;
     }
 
 

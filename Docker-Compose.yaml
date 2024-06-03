@@ -7,6 +7,40 @@ services:
       - "8761:8761"
     networks:
       - my-db-network
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    restart: always
+    hostname: rabbitmq-asid.asiddeploy.com
+    ports:
+      - "8093:15672"
+      - "5672:5672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - my-db-network
+
+  zookeeper:
+    image: 'bitnami/zookeeper:latest'
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    networks:
+      - my-db-network
+  kafka:
+    image: 'bitnami/kafka:latest'
+    restart: always
+    environment:
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    volumes:
+      - 'kafka_data:/bitnami/kafka'
+    ports:
+      - '9092:9092'
+    networks:
+      - my-db-network
+      
   view_rep:
     image: mysql:latest
     environment:
@@ -105,6 +139,7 @@ services:
     networks:
       - my-db-network
     environment:
+      SPRING_RABBITMQ_HOST: rabbitmq
       SPRING_DATASOURCE_URL: jdbc:mysql://view_rep:3306/school_db?createDatabaseIfNotExist=true
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/ 
     depends_on:
@@ -139,6 +174,21 @@ services:
       - teacher_rep
       - eureka-server
     restart: always
+  saga-service:
+    image: saga:latest  # Replace with your image name
+    ports:
+      - "8088:8088"  # Map container port to host port
+    networks:
+      - my-db-network
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_KAFKA_CONSUMER_BOOTSTRAP-SERVERS: kafka:9092
+      SPRING_KAFKA_PRODUCER_BOOTSTRAP-SERVERS: kafka:9092
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/ 
+    depends_on:
+      - kafka
+      - eureka-server
+    restart: always  
 
   student-service:
     image: student:latest  # Replace with your image name
@@ -147,9 +197,13 @@ services:
     networks:
       - my-db-network
     environment:
+      SPRING_KAFKA_CONSUMER_BOOTSTRAP-SERVERS: kafka:9092
+      SPRING_KAFKA_PRODUCER_BOOTSTRAP-SERVERS: kafka:9092
+      SPRING_KAFKA_CONSUMER_GROUP-ID: myGroup
       SPRING_DATASOURCE_URL: jdbc:mysql://student_rep:3306/school_db?createDatabaseIfNotExist=true
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/ 
     depends_on:
+      - kafka
       - student_rep
       - eureka-server
     restart: always
@@ -161,9 +215,13 @@ services:
     networks:
       - my-db-network
     environment:
+      SPRING_KAFKA_CONSUMER_BOOTSTRAP-SERVERS: kafka:9092
+      SPRING_KAFKA_PRODUCER_BOOTSTRAP-SERVERS: kafka:9092
+      SPRING_KAFKA_CONSUMER_GROUP-ID: myGroup
       SPRING_DATASOURCE_URL: jdbc:mysql://parent_rep:3306/school_db?createDatabaseIfNotExist=true
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/ 
     depends_on:
+      - kafka
       - parent_rep
       - eureka-server
     restart: always
@@ -175,6 +233,7 @@ services:
     networks:
       - my-db-network
     environment:
+      SPRING_RABBITMQ_HOST: rabbitmq
       SPRING_DATASOURCE_URL: jdbc:mysql://employee_rep:3306/school_db?createDatabaseIfNotExist=true
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/ 
     depends_on:
@@ -189,9 +248,13 @@ services:
     networks:
       - my-db-network
     environment:
+      SPRING_KAFKA_CONSUMER_BOOTSTRAP-SERVERS: kafka:9092
+      SPRING_KAFKA_PRODUCER_BOOTSTRAP-SERVERS: kafka:9092
+      SPRING_KAFKA_CONSUMER_GROUP-ID: myGroup
       SPRING_DATASOURCE_URL: jdbc:mysql://club_rep:3306/school_db?createDatabaseIfNotExist=true
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/ 
     depends_on:
+      - kafka
       - club_rep
       - eureka-server
     restart: always
@@ -200,6 +263,9 @@ networks:
   my-db-network:
     driver: bridge
 
+volumes:
+  kafka_data:
+    driver: local
 
 
 
