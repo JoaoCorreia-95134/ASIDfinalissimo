@@ -1,0 +1,37 @@
+version: "3.8"
+
+services:
+  student_rep:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: 12345
+      MYSQL_USER: user
+      MYSQL_PASSWORD: paswword
+      MYSQL_DATABASE: school_db
+    ports:
+      - "3307:3306"
+    networks:
+      - my-db-network
+
+  student-service:
+    image: student:latest  # Replace with your image name
+    ports:
+      - "8082:8082"  # Map container port to host port
+    networks:
+      - my-db-network
+    environment:
+      SPRING_KAFKA_CONSUMER_BOOTSTRAP-SERVERS: 141.145.213.246:9092
+      SPRING_KAFKA_PRODUCER_BOOTSTRAP-SERVERS: 141.145.213.246:9092
+      SPRING_KAFKA_CONSUMER_GROUP-ID: myGroup
+      SPRING_DATASOURCE_URL: jdbc:mysql://student_rep:3306/school_db?createDatabaseIfNotExist=true
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://158.178.206.119:8761/eureka/
+      EUREKA_INSTANCE_HOSTNAME: 143.47.42.191
+      EUREKA_INSTANCE_IP_ADDRESS: 143.47.42.191
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: true 
+    depends_on:
+      - student_rep
+    restart: always
+
+networks:
+  my-db-network:
+    driver: bridge

@@ -41,7 +41,7 @@ public class TeacherQueryService {
 
 
 
-    public List<TeacherDTO> getAllStudents() {
+    public List<TeacherDTO> getAllTeachers() {
         return teacherRepository.
                 findAll().
                 stream().

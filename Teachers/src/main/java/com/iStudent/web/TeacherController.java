@@ -37,7 +37,7 @@ public class TeacherController {
     @GetMapping
     public ResponseEntity<List<TeacherDTO>> getAllTeachers() {
         return ResponseEntity
-                .ok(teacherQueryService.getAllStudents());
+                .ok(teacherQueryService.getAllTeachers());
     }
 
     @GetMapping("/{id}")

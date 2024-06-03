@@ -1,0 +1,12 @@
+version: "3.8"
+
+services:
+  gateway-service:
+    image: gateway:latest  # Replace with your image name
+    ports:
+      - "8080:8080"  # Map container port to host port
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://158.178.206.119:8761/eureka/
+      EUREKA_INSTANCE_HOSTNAME: 89.168.54.159
+      EUREKA_INSTANCE_IP_ADDRESS: 89.168.54.159
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: true

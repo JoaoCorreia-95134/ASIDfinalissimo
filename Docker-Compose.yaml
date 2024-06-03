@@ -20,6 +20,8 @@ services:
       RABBITMQ_DEFAULT_PASS: guest
     networks:
       - my-db-network
+    volumes:
+      - ./rabbitmq/etc/definitions.json:/etc/rabbitmq/definitions.json
 
   zookeeper:
     image: 'bitnami/zookeeper:latest'

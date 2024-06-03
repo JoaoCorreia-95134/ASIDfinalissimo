@@ -1,0 +1,18 @@
+version: "3.8"
+
+services: 
+ saga-service:
+    image: saga:latest  # Replace with your image name
+    ports:
+      - "8088:8088"  # Map container port to host port
+    networks:
+      - my-db-network
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: 141.145.213.246:9092
+      SPRING_KAFKA_CONSUMER_BOOTSTRAP-SERVERS: 141.145.213.246:9092
+      SPRING_KAFKA_PRODUCER_BOOTSTRAP-SERVERS: 141.145.213.246:9092
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://158.178.206.119:8761/eureka/
+      EUREKA_INSTANCE_HOSTNAME: 158.179.212.3
+      EUREKA_INSTANCE_IP_ADDRESS: 158.179.212.3
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: true
+    restart: always 

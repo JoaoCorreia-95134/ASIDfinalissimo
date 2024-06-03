@@ -1,0 +1,35 @@
+version: "3.8"
+
+services:
+ teacher_rep:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: 12345
+      MYSQL_USER: user
+      MYSQL_PASSWORD: paswword
+      MYSQL_DATABASE: school_db
+    ports:
+      - "3306:3306" 
+    networks:
+      - my-db-network
+
+ teacher-service:
+    image: teacher:latest  # Replace with your image name
+    ports:
+      - "8081:8081"  # Map container port to host port
+    networks:
+      - my-db-network
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://teacher_rep:3306/school_db?createDatabaseIfNotExist=true
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://158.178.206.119:8761/eureka/
+      EUREKA_INSTANCE_HOSTNAME: 158.179.214.246
+      EUREKA_INSTANCE_IP_ADDRESS: 158.179.214.246
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: true
+    depends_on:
+      - teacher_rep
+    restart: always
+
+networks:
+  my-db-network:
+    driver: bridge
+ 

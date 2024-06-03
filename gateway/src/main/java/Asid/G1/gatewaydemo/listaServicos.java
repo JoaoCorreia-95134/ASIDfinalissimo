@@ -249,6 +249,19 @@ public class listaServicos {
 
     }
 
+    @PostMapping("/addEmployee")
+    public ResponseEntity<?> addEmployee(@RequestBody Map<String, Object> payload) {
+
+        String url = "http://employee-service/employees";
+
+        ResponseEntity<?> response = restTemplate.postForEntity(url, payload, String.class);
+
+        return response;
+
+    }
+
+
+
 
     @GetMapping ("/searchPersonsBigCityView")
     public ResponseEntity<List<UsersWithLargeTown>> searchPerson() {
@@ -277,6 +290,86 @@ public class listaServicos {
             return response;
     }
 
+    @GetMapping("/getClubs")
+    public ResponseEntity<?> getClub() {
+
+        String url = "http://club-service/clubs";
+
+        ResponseEntity<?> responseClubs = restTemplate.getForEntity(
+                url,
+                String.class
+        );
+
+        return responseClubs;
+    }
+
+
+    @GetMapping("/getParents")
+    public ResponseEntity<?> getParents() {
+
+        String url = "http://parent-service/parents";
+
+        ResponseEntity<?> responseParents = restTemplate.getForEntity(
+                url,
+                String.class
+        );
+
+        return responseParents;
+    }
+
+
+    @GetMapping("/getStudents")
+    public ResponseEntity<?> getStudents() {
+
+        String url = "http://student-service/students";
+
+        ResponseEntity<?> responseStudents = restTemplate.getForEntity(
+                url,
+                String.class
+        );
+
+        return responseStudents;
+    }
+
+    @GetMapping("/getTeachers")
+    public ResponseEntity<?> getTeacher() {
+
+        String url = "http://teacher-service/teachers";
+
+        ResponseEntity<?> responseTeachers = restTemplate.getForEntity(
+                url,
+                String.class
+        );
+
+        return responseTeachers;
+    }
+
+    @GetMapping("/getEmployees")
+    public ResponseEntity<?> getEmployee() {
+
+        String url = "http://employee-service/employees";
+
+        ResponseEntity<?> responseEmployees = restTemplate.getForEntity(
+                url,
+                String.class
+        );
+
+        return responseEmployees;
+    }
+
+    @GetMapping("/getTown")
+    public ResponseEntity<?> getTown() {
+
+        String url = "http://town-service/Town";
+
+        ResponseEntity<?> responseTowns = restTemplate.getForEntity(
+                url,
+                String.class
+        );
+
+        return responseTowns;
+    }
+
 
 
 
@@ -288,7 +381,7 @@ public class listaServicos {
                 idTown);
 
         T[] lista = response.getBody();
-
+        System.out.println(lista);
 
         if (lista != null) {
             return ResponseEntity.ok(lista);
